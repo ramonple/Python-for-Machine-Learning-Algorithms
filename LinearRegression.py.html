@@ -1,0 +1,79 @@
+<html>
+<head>
+<title>LinearRegression.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #808080;}
+.s3 { color: #6a8759;}
+.s4 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+LinearRegression.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">pandas </span><span class="s0">as </span><span class="s1">pd</span>
+<span class="s0">import </span><span class="s1">numpy </span><span class="s0">as </span><span class="s1">np</span>
+<span class="s0">import </span><span class="s1">sklearn</span>
+<span class="s0">from </span><span class="s1">sklearn </span><span class="s0">import </span><span class="s1">linear_model</span>
+<span class="s0">from </span><span class="s1">sklearn.utils </span><span class="s0">import </span><span class="s1">shuffle</span>
+<span class="s0">import </span><span class="s1">matplotlib.pyplot </span><span class="s0">as </span><span class="s1">pyplot</span>
+<span class="s0">import </span><span class="s1">pickle</span>
+<span class="s0">from </span><span class="s1">matplotlib </span><span class="s0">import </span><span class="s1">style</span>
+
+
+<span class="s2"># linear Regression</span>
+<span class="s1">data = pd.read_csv(</span><span class="s3">&quot;student-mat.csv&quot;</span><span class="s0">,</span><span class="s1">sep=</span><span class="s3">&quot;;&quot;</span><span class="s1">) </span><span class="s2"># sep argument will be used as separator or delimiter.</span>
+                                             <span class="s2"># If sep argument is not specified then default engine for parsing ( C Engine) will be used which uses ‘,’ as delimiter</span>
+<span class="s1">data = data[ [</span><span class="s3">&quot;G1&quot;</span><span class="s0">,</span><span class="s3">&quot;G2&quot;</span><span class="s0">,</span><span class="s3">&quot;G3&quot;</span><span class="s0">,</span><span class="s3">&quot;studytime&quot;</span><span class="s0">, </span><span class="s3">&quot;failures&quot;</span><span class="s0">,</span><span class="s3">&quot;absences&quot;</span><span class="s1">] ]</span>
+<span class="s1">predict = </span><span class="s3">&quot;G3&quot;</span>
+
+<span class="s1">X = np.array(data.drop( [predict]</span><span class="s0">, </span><span class="s1">axis=</span><span class="s4">1</span><span class="s1">)) </span><span class="s2"># select attributes. axis 0 for index, 1 for column</span>
+<span class="s1">y=np.array(data[predict]) </span><span class="s2"># select the dependent variable</span>
+<span class="s1">x_train</span><span class="s0">, </span><span class="s1">x_test</span><span class="s0">, </span><span class="s1">y_train</span><span class="s0">, </span><span class="s1">y_test = sklearn.model_selection.train_test_split(X</span><span class="s0">, </span><span class="s1">y</span><span class="s0">, </span><span class="s1">test_size=</span><span class="s4">0.2</span><span class="s1">)</span>
+
+<span class="s1">best = </span><span class="s4">0</span>
+<span class="s0">for </span><span class="s1">_ </span><span class="s0">in </span><span class="s1">range(</span><span class="s4">30</span><span class="s1">): </span><span class="s2"># select the best from 30 runs#</span>
+<span class="s2">#must be a space before x_train</span>
+   <span class="s1">x_train</span><span class="s0">, </span><span class="s1">x_test</span><span class="s0">,</span><span class="s1">y_train</span><span class="s0">,</span><span class="s1">y_test = sklearn.model_selection.train_test_split(X</span><span class="s0">,</span><span class="s1">y</span><span class="s0">,</span><span class="s1">test_size = </span><span class="s4">0.2</span><span class="s1">) </span><span class="s2"># split training and test dataset</span>
+                  <span class="s2"># focus on the squence. first x and then y, first train and then test</span>
+<span class="s1">linear = linear_model.LinearRegression()</span>
+<span class="s1">linear.fit(x_train</span><span class="s0">,</span><span class="s1">y_train) </span><span class="s2"># use the t_train and y_train to find the regression</span>
+<span class="s1">acc = linear.score(x_test</span><span class="s0">,</span><span class="s1">y_test) </span><span class="s2"># accuracy</span>
+<span class="s1">print(acc)</span>
+
+<span class="s0">if </span><span class="s1">acc &gt; best:</span>
+    <span class="s1">best =acc  </span><span class="s2"># also save the currently best one</span>
+<span class="s0">with </span><span class="s1">open(</span><span class="s3">&quot;studentmodel.pickle&quot;</span><span class="s0">, </span><span class="s3">&quot;wb&quot;</span><span class="s1">) </span><span class="s0">as </span><span class="s1">f:</span>
+    <span class="s1">pickle.dump(linear</span><span class="s0">,</span><span class="s1">f)</span>
+
+<span class="s1">pickle_in = open(</span><span class="s3">&quot;studentmodel.pickle&quot;</span><span class="s0">, </span><span class="s3">&quot;rb&quot;</span><span class="s1">)</span>
+<span class="s1">linear = pickle.load(pickle_in)</span>
+
+<span class="s1">print(</span><span class="s3">&quot;Coefficients: </span><span class="s0">\n</span><span class="s3">&quot;</span><span class="s0">, </span><span class="s1">linear.coef_)</span>
+<span class="s1">print(</span><span class="s3">&quot;Intercept: </span><span class="s0">\n</span><span class="s3">&quot;</span><span class="s0">, </span><span class="s1">linear.intercept_)</span>
+
+<span class="s1">predictions = linear.predict(x_test)</span>
+
+<span class="s0">for  </span><span class="s1">x </span><span class="s0">in </span><span class="s1">range(len(predictions)):</span>
+    <span class="s1">print(predictions[x]</span><span class="s0">, </span><span class="s1">x_test[x]</span><span class="s0">, </span><span class="s1">y_test[x])</span>
+
+<span class="s1">p1 = </span><span class="s3">&quot;G1&quot;</span>
+<span class="s1">style.use(</span><span class="s3">&quot;ggplot&quot;</span><span class="s1">)</span>
+<span class="s1">pyplot.scatter(data[p1]</span><span class="s0">,</span><span class="s1">data[</span><span class="s3">&quot;G3&quot;</span><span class="s1">]) </span><span class="s2"># G3 is the predictor</span>
+<span class="s1">pyplot.xlabel(p1)</span>
+<span class="s1">pyplot.ylabel (</span><span class="s3">&quot;final grage&quot;</span><span class="s1">)</span>
+<span class="s1">pyplot.show()</span>
+
+<span class="s1">p2 = </span><span class="s3">&quot;failures&quot;</span>
+<span class="s1">style.use(</span><span class="s3">&quot;ggplot&quot;</span><span class="s1">)</span>
+<span class="s1">pyplot.scatter(data[p2]</span><span class="s0">,</span><span class="s1">data[</span><span class="s3">&quot;G3&quot;</span><span class="s1">]) </span><span class="s2"># G3 is the predictor</span>
+<span class="s1">pyplot.xlabel(p2)</span>
+<span class="s1">pyplot.ylabel (</span><span class="s3">&quot;final grage&quot;</span><span class="s1">)</span>
+<span class="s1">pyplot.show()</span></pre>
+</body>
+</html>
