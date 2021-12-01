@@ -1,96 +1,38 @@
-<html>
-<head>
-<title>KNN.py</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<style type="text/css">
-.s0 { color: #808080;}
-.s1 { color: #a9b7c6;}
-.s2 { color: #cc7832;}
-.s3 { color: #6a8759;}
-.s4 { color: #6897bb;}
-</style>
-</head>
-<body bgcolor="#2b2b2b">
-<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
-<tr><td><center>
-<font face="Arial, Helvetica" color="#000000">
-KNN.py</font>
-</center></td></tr></table>
-<pre><span class="s0"># KNN</span>
-<span class="s2">from </span><span class="s1">sklearn </span><span class="s2">import </span><span class="s1">preprocessing</span>
+import sklearn
+from sklearn.utils import shuffle
+from sklearn.neighbors import KNeighborsClassifier
+import pandas as pd
+import numpy as np
+from sklearn import linear_model, preprocessing
 
-<span class="s2">import </span><span class="s1">sklearn</span>
-<span class="s2">from </span><span class="s1">sklearn.utils </span><span class="s2">import </span><span class="s1">shuffle</span>
-<span class="s2">from </span><span class="s1">sklearn.neighbors </span><span class="s2">import </span><span class="s1">KNeighborsClassifier</span>
-<span class="s2">import </span><span class="s1">pandas </span><span class="s2">as </span><span class="s1">pd</span>
-<span class="s2">import </span><span class="s1">numpy </span><span class="s2">as </span><span class="s1">np</span>
-<span class="s2">from </span><span class="s1">sklearn </span><span class="s2">import </span><span class="s1">linear_model</span><span class="s2">, </span><span class="s1">preprocessing</span>
+data = pd.read_csv("car.data")
 
-<span class="s0"># Loading Data</span>
-<span class="s1">data=pd.read_csv(</span><span class="s3">&quot;car.data&quot;</span><span class="s1">)</span>
-<span class="s1">print(data.head())</span>
+le = preprocessing.LabelEncoder()
+buying = le.fit_transform(list(data["buying"]))
+maint = le.fit_transform(list(data["maint"]))
+door = le.fit_transform(list(data["door"]))
+persons = le.fit_transform(list(data["persons"]))
+lug_boot = le.fit_transform(list(data["lug_boot"]))
+safety = le.fit_transform(list(data["safety"]))
+cls = le.fit_transform(list(data["class"]))
 
-<span class="s0"># Converting Data</span>
-<span class="s0"># As you may have noticed much of our data is not numeric. In order to train the K-Nearest Neighbor Classifier we must</span>
-<span class="s0">#  convert any string data into some kind of a number. Luckily for us sklearn has a method that can do this for us.</span>
+predict = "class"
 
-<span class="s0"># We will start by creating a label encoder object and then use that to encode each column of our data into integers.</span>
-<span class="s1">le=preprocessing.LabelEncoder()</span>
+X = list(zip(buying, maint, door, persons, lug_boot, safety))
+y = list(cls)
 
-<span class="s0"># The method fit_transform() takes a list (each of our columns) and will return to us an array containing our new values.</span>
-<span class="s1">buying = le.fit_transform(list(data[</span><span class="s3">&quot;buying&quot;</span><span class="s1">]))</span>
-<span class="s1">maint = le.fit_transform(list(data[</span><span class="s3">&quot;maint&quot;</span><span class="s1">]))</span>
-<span class="s1">door = le.fit_transform(list(data[</span><span class="s3">&quot;door&quot;</span><span class="s1">]))</span>
-<span class="s1">persons = le.fit_transform(list(data[</span><span class="s3">&quot;persons&quot;</span><span class="s1">]))</span>
-<span class="s1">lug_boot = le.fit_transform(list(data[</span><span class="s3">&quot;lug_boot&quot;</span><span class="s1">]))</span>
-<span class="s1">safety = le.fit_transform(list(data[</span><span class="s3">&quot;safety&quot;</span><span class="s1">]))</span>
-<span class="s1">cls = le.fit_transform(list(data[</span><span class="s3">&quot;class&quot;</span><span class="s1">]))</span>
+x_train, x_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y, test_size = 0.1)
 
-<span class="s0"># Now we need to recombine our data into a feature list and a label list. We can use the zip() function to makes things easier.</span>
-<span class="s0"># The zip() function takes iterables (can be zero or more), aggregates them in a tuple, and returns it.</span>
-<span class="s1">X = list(zip(buying</span><span class="s2">, </span><span class="s1">maint</span><span class="s2">, </span><span class="s1">door</span><span class="s2">, </span><span class="s1">persons</span><span class="s2">, </span><span class="s1">lug_boot</span><span class="s2">, </span><span class="s1">safety))  </span><span class="s0"># features</span>
-<span class="s1">y = list(cls)  </span><span class="s0"># labels</span>
+model = KNeighborsClassifier(n_neighbors=9)
 
-<span class="s1">x_train</span><span class="s2">,</span><span class="s1">x_test</span><span class="s2">,</span><span class="s1">y_train</span><span class="s2">,</span><span class="s1">y_test = sklearn.model_selection.train_test_split(X</span><span class="s2">,</span><span class="s1">y</span><span class="s2">,</span><span class="s1">test_size = </span><span class="s4">0.1</span><span class="s1">)</span>
+model.fit(x_train, y_train)
+acc = model.score(x_test, y_test)
+print(acc)
 
-<span class="s0"># Training a KNN Classifier</span>
-<span class="s0"># from sklearn.neighbors import KNeighborsClassifier</span>
-<span class="s1">model=KNeighborsClassifier(n_neighbors=</span><span class="s4">5</span><span class="s1">)</span>
+predicted = model.predict(x_test)
+names = ["unacc", "acc", "good", "vgood"]
 
-<span class="s1">model.fit(x_train</span><span class="s2">,</span><span class="s1">y_train)</span>
-<span class="s1">acc=model.score(x_test</span><span class="s2">,</span><span class="s1">y_test)</span>
-<span class="s1">print(acc)</span>
-
-<span class="s0"># Testing Our Model</span>
-<span class="s3">'''predicted = model.predict(x_test) 
-names =[&quot;unacc&quot;,&quot;acc&quot;,&quot;good&quot;,&quot;vgood&quot;] #vgood very good 
- 
-for x in range(len(predicted)): 
-    print(&quot;Predicted: &quot;, names[predicted[x]], &quot;Data: &quot;, x_test[x], &quot;Actual: &quot;, names[y_test[x]])'''</span>
-
-<span class="s0"># This will display the predicted class, our data and the actual class</span>
-<span class="s0"># We create a names list so that we can convert our integer predictions into</span>
-<span class="s0"># their string representation</span>
-
-
-<span class="s0"># Looking at Neighbors</span>
-<span class="s0"># The KNN model has a unique method that allows for us to see the neighbors of a given data point.</span>
-<span class="s0"># We can use this information to plot our data and get a better idea of where our model may lack accuracy.</span>
-<span class="s0"># We can use model.neighbors to do this.</span>
-<span class="s0">#</span>
-<span class="s0"># Note: the .neighbors method takes 2D as input, this means if we want to pass one data point we need surround it</span>
-<span class="s0"># with [] so that it is in the right shape.</span>
-<span class="s0"># Parameters: The parameters for .neighbors are as follows: data(2D array), # of neighbors(int), distance(True or False)</span>
-<span class="s0"># Return: This will return to us an array with the index in our data of each neighbor.</span>
-<span class="s0"># If distance=True then it will also return the distance to each neighbor from our data point.</span>
-
-<span class="s1">predicted = model.predict(x_test)</span>
-<span class="s1">names = [</span><span class="s3">&quot;unacc&quot;</span><span class="s2">, </span><span class="s3">&quot;acc&quot;</span><span class="s2">, </span><span class="s3">&quot;good&quot;</span><span class="s2">, </span><span class="s3">&quot;vgood&quot;</span><span class="s1">] </span><span class="s0"># refer to the data set, column 'class'</span>
-
-<span class="s2">for </span><span class="s1">x </span><span class="s2">in </span><span class="s1">range(len(predicted)):</span>
-    <span class="s1">print(</span><span class="s3">&quot;Predicted: &quot;</span><span class="s2">, </span><span class="s1">names[predicted[x]]</span><span class="s2">, </span><span class="s3">&quot;Data: &quot;</span><span class="s2">, </span><span class="s1">x_test[x]</span><span class="s2">, </span><span class="s3">&quot;Actual: &quot;</span><span class="s2">, </span><span class="s1">names[y_test[x]])</span>
-    <span class="s0"># Now we will we see the neighbors of each point in our testing data</span>
-    <span class="s1">n = model.kneighbors([x_test[x]]</span><span class="s2">, </span><span class="s4">9</span><span class="s2">, True</span><span class="s1">)</span>
-    <span class="s1">print(</span><span class="s3">&quot;N: &quot;</span><span class="s2">, </span><span class="s1">n)</span></pre>
-</body>
-</html>
+for x in range(len(predicted)):
+    print("Predicted: ", names[predicted[x]], "Data: ", x_test[x], "Actual: ", names[y_test[x]])
+    n = model.kneighbors([x_test[x]], 9, True)
+    print("N: ", n)
