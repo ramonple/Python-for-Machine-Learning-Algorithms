@@ -14,9 +14,9 @@ X_train,X_test,y_train,y_test = train_test_split(X,y,test_size = 0.2,random_stat
 
 classes = [ 'malignant','benign']
 
-clf = svm.SVC(kernel="linear")
+classifier = svm.SVC(kernel="linear")
 #clf=svm.SVC(kernel = "ploy",degree = 2)  # as polynomial
-clf.fit(X_train, y_train)
+classifier.fit(X_train, y_train)
 
 y_pred = clf.predict(X_test)
 
